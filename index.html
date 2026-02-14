@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Поздравляю с 14 февраля!</title>
+    <style>
+        * {
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        body {
+            background: #0a0c0f;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* вертикальное центрирование */
+            width: 100%;
+            max-width: 100vw;
+            padding: 0; /* убираем лишние отступы */
+            box-sizing: border-box;
+            position: relative;
+            z-index: 10;
+            min-height: 90vh; /* фиксированная высота для стабильности */
+        }
+
+        /* Все основные блоки будут иметь фиксированную высоту */
+        #startBtn, #nextBtn, .fireworks-container, #typingArea, #finalStage {
+            margin: 0; /* убираем все внешние отступы */
+        }
+
+        #startBtn, #nextBtn {
+            background: transparent;
+            border: 3px solid #ff4d6d;
+            color: #ff4d6d;
+            font-size: 3rem;
+            font-weight: bold;
+            padding: 1.5rem 4rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            box-shadow: 0 0 20px #ff4d6d, inset 0 0 10px #ff4d6d;
+            transition: all 0.3s ease;
+            text-shadow: 0 0 8px currentColor;
+            /* margin: 0; – уже убрано */
+        }
+
+        #nextBtn {
+            font-size: 2.5rem;
+            padding: 1rem 3rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 3s ease, visibility 3s ease;
+            pointer-events: none;
+            transform: translateY(25px);
+        }
+
+        #nextBtn.visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transform: translateY(25px);
+        }
+
+        #nextBtn:not(.visible) {
+            transition: none;
+        }
+
+        #startBtn:hover, #nextBtn:hover {
+            animation: glowPulse 1.5s infinite alternate;
+            border-color: #ffb3c6;
+            transform: scale(1.02);
+        }
+
+        #nextBtn:hover {
+    transform: translateY(25px) scale(1.02);
+        }
+
+        @keyframes glowPulse {
+            0% {
+                box-shadow: 0 0 20px #ff4d6d, inset 0 0 10px #ff4d6d;
+                border-color: #ff4d6d;
+                color: #ff4d6d;
+            }
+            50% {
+                box-shadow: 0 0 35px #ff8fa3, inset 0 0 15px #ff8fa3;
+                border-color: #ff8fa3;
+                color: #ff8fa3;
+            }
+            100% {
+                box-shadow: 0 0 20px #ff4d6d, inset 0 0 10px #ff4d6d;
+                border-color: #ff4d6d;
+                color: #ff4d6d;
+            }
+        }
+
+        #startBtn:active, #nextBtn:active {
+            transform: scale(0.98);
+        }
+
+        #fireworksArea {
+            background: #0f1419;
+            border-radius: 30px;
+            padding: 10px;
+            border: 4px solid #ff4d6d;
+            box-shadow: 0 0 40px #ff4d6d55, inset 0 0 15px #00000099;
+            color: #ffb6c1;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            line-height: 1.2;
+            white-space: pre;
+            overflow: hidden;
+            width: 960px;
+            max-width: 100%;
+            height: 576px; /* фиксированная высота */
+            text-align: left;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        #typingArea {
+            background: #0f1419;
+            border-radius: 30px;
+            padding: 25px;
+            border: 4px solid #ff4d6d;
+            box-shadow: 0 0 40px #ff4d6d55, inset 0 0 15px #00000099;
+            color: #ffb6c1;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            line-height: 1.3;
+            width: 960px;
+            max-width: 100%;
+            height: 576px; /* фиксированная высота */
+            overflow-y: auto;
+            text-align: left;
+            box-sizing: border-box;
+            white-space: normal;
+            touch-action: pan-y;
+        }
+
+        #typingContent {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .text-line {
+            margin: 0;
+            padding: 0;
+            line-height: 1.3;
+        }
+
+        .empty-line {
+            margin: 0;
+            padding: 0;
+            line-height: 1;
+            height: 1em;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .message {
+            margin-top: 20px;
+            color: #ffb6c1;
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px #ff4d6d;
+            line-height: 1.3;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+        }
+
+        #clickCounter {
+            margin-bottom: 15px;
+            color: #ffb6c1;
+            font-size: 1.5rem;
+            text-shadow: 0 0 5px #ff4d6d;
+        }
+
+        .fireworks-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 576px; /* такая же высота, как у дочернего блока */
+            justify-content: flex-start; /* контент прижат к верху, но центрируется через родителя */
+        }
+
+        #finalStage {
+            width: 960px;
+            max-width: 100%;
+            box-sizing: border-box;
+            height: 576px; /* фиксированная высота */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .portraits {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            /* margin-top: 0; убираем лишний отступ */
+        }
+
+        .portrait-box {
+            text-align: center;
+            flex: 0 1 auto;
+        }
+
+        .portrait-box img {
+            width: min(256px, 70vw);
+            height: auto;
+            border-radius: 30px;
+            display: block;
+            -webkit-user-drag: none;
+            user-drag: none;
+            -webkit-touch-callout: none;
+        }
+
+        .portrait-tanya {
+            box-shadow: 0 0 40px #1e4d2e;
+        }
+
+        .portrait-natasha {
+            box-shadow: 0 0 40px #1e3a5f;
+        }
+
+        .portrait-box p {
+            margin-top: 15px;
+            font-size: 2rem;
+            color: #ffb6c1;
+            text-shadow: 0 0 10px #ff4d6d;
+        }
+
+        .firework-left, .firework-right {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 100px;
+            pointer-events: none;
+            z-index: 20;
+            overflow: hidden;
+        }
+
+        .firework-left { left: 0; }
+        .firework-right { right: 0; }
+
+        .firework-left::before, .firework-left::after,
+        .firework-right::before, .firework-right::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #ffb6c1;
+            box-shadow: 0 0 10px #ff4d6d, 0 0 20px #ff8fa3;
+            animation: sparkle 2s infinite ease-in-out;
+        }
+
+        .firework-left::before { top: 20%; left: 30%; animation-delay: 0s; }
+        .firework-left::after { top: 70%; left: 50%; animation-delay: 0.7s; }
+        .firework-right::before { top: 40%; right: 40%; animation-delay: 0.3s; }
+        .firework-right::after { top: 80%; right: 20%; animation-delay: 1.2s; }
+
+        .firework-left span, .firework-right span {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #ffb6c1;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff4d6d;
+            animation: sparkle 1.5s infinite alternate;
+        }
+
+        @keyframes sparkle {
+            0% { opacity: 0.2; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .particle {
+            position: fixed;
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            color: #ffb6c1;
+            text-shadow: 0 0 10px #ff4d6d;
+            pointer-events: none;
+            z-index: 15;
+            white-space: nowrap;
+            transform: translate(0, 0);
+            transition: transform 1s ease-out, opacity 1s ease-out;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="firework-left hidden" id="fireworkLeft"></div>
+    <div class="firework-right hidden" id="fireworkRight"></div>
+
+    <div id="container">
+        <button id="startBtn">ОТКРЫТЬ</button>
+        <div class="fireworks-container hidden" id="fireworksContainer">
+            <div id="clickCounter">Осталось нажатий: 20</div>
+            <div id="fireworksArea"></div>
+            <div id="message" class="message">
+                <div>Таня! Наташа! &lt;3</div>
+                <div>Поздравляю вас с 14 февраля :)</div>
+            </div>
+        </div>
+        <div id="typingArea" class="hidden">
+            <div id="typingContent"></div>
+        </div>
+        <button id="nextBtn">ДАЛЕЕ</button>
+        <div id="finalStage" class="hidden">
+            <div class="portraits">
+                <div class="portrait-box">
+                    <img src="Tanya.jpg" alt="Таня" class="portrait-tanya" loading="lazy" draggable="false">
+                    <p>Люблю &lt;3</p>
+                </div>
+                <div class="portrait-box">
+                    <img src="Natasha.jpg" alt="Наташа" class="portrait-natasha" loading="lazy" draggable="false">
+                    <p>Люблю &lt;3</p>
+                </div>
+            </div>
+        </div>
+        <audio id="bgMusic" loop preload="auto" style="display: none;"></audio>
+    </div>
+
+    <script>
+    // (скрипт без изменений, тот же, что и в вашем последнем файле)
+    (function() {
+        const W = 80;
+        const H = 24;
+        const CLICKS_NEEDED = 20;
+
+        const btn = document.getElementById('startBtn');
+        const area = document.getElementById('fireworksArea');
+        const fireworksContainer = document.getElementById('fireworksContainer');
+        const typingArea = document.getElementById('typingArea');
+        const typingContent = document.getElementById('typingContent');
+        const counterDiv = document.getElementById('clickCounter');
+        const nextBtn = document.getElementById('nextBtn');
+        const finalStage = document.getElementById('finalStage');
+        const bgMusic = document.getElementById('bgMusic');
+        const fireworkLeft = document.getElementById('fireworkLeft');
+        const fireworkRight = document.getElementById('fireworkRight');
+
+        bgMusic.src = 'music.mp3';
+        bgMusic.volume = 0.15;
+
+        let particles = [];
+        let animationInterval = null;
+        let animationRunning = false;
+        let clickCount = 0;
+        let gamePhase = 'button';
+        let areaClickListener = null;
+        let typingFinished = false;
+
+        function createExtraSparks() {
+            for (let i = 0; i < 8; i++) {
+                const span = document.createElement('span');
+                span.style.left = Math.random() * 80 + '%';
+                span.style.top = Math.random() * 90 + '%';
+                span.style.animationDelay = Math.random() * 2 + 's';
+                span.style.animationDuration = (1 + Math.random() * 2) + 's';
+                fireworkLeft.appendChild(span.cloneNode(true));
+                fireworkRight.appendChild(span.cloneNode(true));
+            }
+        }
+        createExtraSparks();
+
+        const textLines = [
+            "Наташа! Таня! Я вас очень люблю! Вы одни из лучших, кто встречался мне в жизни! Мне очень приятно с вами гулять, играть, общаться и просто быть.",
+            "Надеюсь это взаимно! (｡•́︿•̀｡)",
+            "",
+            "Таня: Ух! Спасибо тебе за всё! Ты столько всего делаешь! А ещё у тебя ачишуительные рисунки! Иногда я испытывал к ним сильную «симпатию» — такие же приятные чувства как от игр (а они в свою очередь — самое важное для меня в жизни, я очень люблю пробовать разные игры — от нн до AAA).",
+            "",
+            "Наташа: Мне очень нравится с тобой играть! Когда мы играли в Alias, Таня и Саша что-то бурно обсуждали, а мы с тобой тихонько сидели, мне показалось это мило и забавно. А посиделки в геншине были для меня очень дорогими!",
+            "",
+            "Надеюсь, что мы часто будем играть!",
+            "Надеюсь, чтобы у вас не было проблем на работе и в жизни!",
+            "Надеюсь, чтобы вы были счастливыми :3",
+            "(^.^)~♥"
+        ];
+
+        function randomChar() {
+            const chars = ['*', '+', '.', ':', 'o', '✧', '✦', '⋆', '⋅', '@', '%', '#'];
+            return chars[Math.floor(Math.random() * chars.length)];
+        }
+
+        function createExplosion(centerX, centerY, count = 20) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * 2 * Math.PI;
+                const speed = Math.random() * 0.8 + 0.3;
+                particles.push({
+                    x: centerX,
+                    y: centerY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    char: randomChar(),
+                    life: Math.floor(Math.random() * 10 + 8)
+                });
+            }
+        }
+
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life--;
+                if (p.life <= 0 || p.x < 0 || p.x >= W || p.y < 0 || p.y >= H) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        function renderFireworks() {
+            const grid = Array(H).fill().map(() => Array(W).fill(' '));
+            particles.forEach(p => {
+                const x = Math.floor(p.x);
+                const y = Math.floor(p.y);
+                if (x >= 0 && x < W && y >= 0 && y < H) {
+                    grid[y][x] = p.char;
+                }
+            });
+            let output = '';
+            for (let row = 0; row < H; row++) {
+                output += grid[row].join('') + '\n';
+            }
+            area.textContent = output;
+        }
+
+        function stepFireworks() {
+            updateParticles();
+            renderFireworks();
+        }
+
+        function startTyping() {
+            typingArea.classList.remove('hidden');
+            typingContent.innerHTML = '';
+
+            let lineIndex = 0;
+            let charIndex = 0;
+            let currentLine = textLines[lineIndex] || '';
+            let currentLineElement = null;
+
+            function createNewLine() {
+                const lineDiv = document.createElement('div');
+                if (currentLine === '') {
+                    lineDiv.className = 'empty-line';
+                    lineDiv.innerHTML = ' ';
+                } else {
+                    lineDiv.className = 'text-line';
+                }
+                typingContent.appendChild(lineDiv);
+                return lineDiv;
+            }
+
+            currentLineElement = createNewLine();
+
+            function typeNextChar() {
+                if (lineIndex >= textLines.length) {
+                    if (!typingFinished) {
+                        typingFinished = true;
+                        setTimeout(() => {
+                            nextBtn.classList.add('visible');
+                        }, 5000);
+                    }
+                    return;
+                }
+
+                if (charIndex < currentLine.length) {
+                    if (!currentLineElement.classList.contains('empty-line')) {
+                        currentLineElement.innerHTML += currentLine[charIndex];
+                    }
+                    charIndex++;
+                    setTimeout(typeNextChar, 40);
+                } else {
+                    lineIndex++;
+                    if (lineIndex < textLines.length) {
+                        currentLine = textLines[lineIndex];
+                        charIndex = 0;
+                        currentLineElement = createNewLine();
+                    }
+                    setTimeout(typeNextChar, 200);
+                }
+            }
+
+            typeNextChar();
+        }
+
+        function onAreaClick(e) {
+            if (gamePhase !== 'fireworks') return;
+
+            clickCount++;
+            counterDiv.textContent = `Осталось нажатий: ${CLICKS_NEEDED - clickCount}`;
+
+            const rect = area.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const col = Math.floor(x / 12);
+            const row = Math.floor(y / 24);
+            if (col >= 0 && col < W && row >= 0 && row < H) {
+                createExplosion(col, row, 20);
+            }
+
+            if (clickCount >= CLICKS_NEEDED) {
+                gamePhase = 'typing';
+                fireworksContainer.classList.add('hidden');
+                if (animationInterval) {
+                    clearInterval(animationInterval);
+                    animationInterval = null;
+                    animationRunning = false;
+                }
+                startTyping();
+            }
+        }
+
+        function startFireworksMode() {
+            btn.classList.add('hidden');
+            fireworksContainer.classList.remove('hidden');
+            counterDiv.textContent = `Осталось нажатий: ${CLICKS_NEEDED}`;
+
+            clickCount = 0;
+            particles = [];
+            gamePhase = 'fireworks';
+
+            if (!animationRunning) {
+                animationInterval = setInterval(stepFireworks, 100);
+                animationRunning = true;
+            }
+
+            if (areaClickListener) {
+                area.removeEventListener('click', areaClickListener);
+            }
+            areaClickListener = onAreaClick;
+            area.addEventListener('click', areaClickListener);
+
+            bgMusic.play().catch(e => {
+                console.log('Автозапуск музыки заблокирован браузером');
+            });
+        }
+
+        nextBtn.addEventListener('click', function() {
+            typingArea.classList.add('hidden');
+            nextBtn.classList.remove('visible');
+            finalStage.classList.remove('hidden');
+            fireworkLeft.classList.remove('hidden');
+            fireworkRight.classList.remove('hidden');
+            gamePhase = 'final';
+        });
+
+        function createFinalParticle(x, y, char) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.textContent = char;
+            particle.style.left = x + 'px';
+            particle.style.top = y + 'px';
+            document.body.appendChild(particle);
+
+            const angle = Math.random() * 2 * Math.PI;
+            const distance = 50 + Math.random() * 100;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance;
+
+            setTimeout(() => {
+                particle.style.transform = `translate(${dx}px, ${dy}px)`;
+                particle.style.opacity = '0';
+            }, 10);
+
+            setTimeout(() => {
+                particle.remove();
+            }, 1000);
+        }
+
+        function onFinalDocumentClick(e) {
+            if (gamePhase !== 'final') return;
+            const x = e.clientX;
+            const y = e.clientY;
+            for (let i = 0; i < 15; i++) {
+                const char = randomChar();
+                createFinalParticle(x, y, char);
+            }
+        }
+
+        document.addEventListener('click', onFinalDocumentClick);
+
+        btn.addEventListener('click', startFireworksMode);
+    })();
+    </script>
+</body>
+</html>
